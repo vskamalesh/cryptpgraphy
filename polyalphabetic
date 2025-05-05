@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+void generateFullKey(char *key, char *fullKey, int messageLen) {
+    int keyLen = strlen(key);
+    for (int i = 0; i < messageLen; i++) {
+        fullKey[i] = key[i % keyLen];
+    }
+    fullKey[messageLen] = '\0'; 
+}
+
+void encrypt(char *message, char *key) {
+    char fullKey[1000];
+    generateFullKey(key, fullKey, strlen(message));
+
+    for (int i = 0; message[i] != '\0'; i++) {
+        if (isalpha(message[i])) {
+            char base = isupper(message[i]) ? 'A' : 'a';
+            char k = isupper(fullKey[i]) ? fullKey[i] : toupper(fullKey[i]);
+            int shift = k - 'A';
+            message[i] = ((message[i] - base + shift) % 26) + base;
+        }
+    }
+}
+
+void decrypt(char *message, char *key) {
+    char fullKey[1000];
+    generateFullKey(key, fullKey, strlen(message));
+
+    for (int i = 0; message[i] != '\0'; i++) {
+        if (isalpha(message[i])) {
+            char base = isupper(message[i]) ? 'A' : 'a';
+            char k = isupper(fullKey[i]) ? fullKey[i] : toupper(fullKey[i]);
+            int shift = k - 'A';
+            message[i] = ((message[i] - base - shift + 26) % 26) + base;
+        }
+    }
+}
+
+int main() {
+    char message[1000], key[100];
+    int choice;
+
+    printf("Enter a message: ");
+    fgets(message, sizeof(message), stdin);
+    message[strcspn(message, "\n")] = '\0';
+
+    printf("Enter a keyword: ");
+    scanf("%s", key);
+
+    printf("\nChoose operation:\n1. Encrypt\n2. Decrypt\nEnter choice: ");
+    scanf("%d", &choice);
+    getchar(); 
+
+    if (choice == 1) {
+        encrypt(message, key);
+        printf("Encrypted message: %s\n", message);
+    } else if (choice == 2) {
+        decrypt(message, key);
+        printf("Decrypted message: %s\n", message);
+    } else {
+        printf("Invalid choice.\n");
+    }
+
+    return 0;
+}
