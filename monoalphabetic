@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+char key[] = "QWERTYUIOPASDFGHJKLZXCVBNM";
+
+void generateReverseKey(char reverseKey[26]) {
+    for (int i = 0; i < 26; i++) {
+        reverseKey[key[i] - 'A'] = 'A' + i;
+    }
+}
+
+void encrypt(char *message) {
+    for (int i = 0; message[i] != '\0'; i++) {
+        if (isalpha(message[i])) {
+            int is_upper = isupper(message[i]);
+            char base = is_upper ? 'A' : 'a';
+            int index = message[i] - base;
+            char enc_char = key[index];
+            message[i] = is_upper ? enc_char : tolower(enc_char);
+        }
+    }
+}
+
+void decrypt(char *message) {
+    char reverseKey[26];
+    generateReverseKey(reverseKey);
+
+    for (int i = 0; message[i] != '\0'; i++) {
+        if (isalpha(message[i])) {
+            int is_upper = isupper(message[i]);
+            char temp = is_upper ? message[i] : toupper(message[i]);
+            int index = temp - 'A';
+            char dec_char = reverseKey[index];
+            message[i] = is_upper ? dec_char : tolower(dec_char);
+        }
+    }
+}
+
+int main() {
+    char message[1000];
+    int choice;
+
+    printf("Enter a message: ");
+    fgets(message, sizeof(message), stdin);
+    message[strcspn(message, "\n")] = '\0';
+
+    printf("\nChoose operation:\n1. Encrypt\n2. Decrypt\nEnter choice: ");
+    scanf("%d", &choice);
+
+    getchar();
+
+    if (choice == 1) {
+        encrypt(message);
+        printf("Encrypted message: %s\n", message);
+    } else if (choice == 2) {
+        decrypt(message);
+        printf("Decrypted message: %s\n", message);
+    } else {
+        printf("Invalid choice.\n");
+    }
+
+    return 0;
+}
