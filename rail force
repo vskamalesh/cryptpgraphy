@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <string.h>
+
+void encrypt(char *msg, int key, char *res) {
+    int len = strlen(msg), k = 0, dir, row;
+    char rail[key][len];
+    memset(rail, '\n', sizeof(rail));
+
+    for (int i = 0, row = 0, dir = 1; i < len; i++) {
+        rail[row][i] = msg[i];
+        row += dir;
+        if (row == 0 || row == key - 1) dir *= -1;
+    }
+
+    for (int i = 0; i < key; i++)
+        for (int j = 0; j < len; j++)
+            if (rail[i][j] != '\n')
+                res[k++] = rail[i][j];
+    res[k] = '\0';
+}
+
+void decrypt(char *cipher, int key, char *res) {
+    int len = strlen(cipher), k = 0;
+    char rail[key][len];
+    memset(rail, '\n', sizeof(rail));
+
+    for (int i = 0, row = 0, dir = 1; i < len; i++) {
+        rail[row][i] = '*';
+        row += dir;
+        if (row == 0 || row == key - 1) dir *= -1;
+    }
+
+    for (int i = 0; i < key; i++)
+        for (int j = 0; j < len; j++)
+            if (rail[i][j] == '*')
+                rail[i][j] = cipher[k++];
+
+    for (int i = 0, row = 0, dir = 1; i < len; i++) {
+        res[i] = rail[row][i];
+        row += dir;
+        if (row == 0 || row == key - 1) dir *= -1;
+    }
+    res[len] = '\0';
+}
+
+int main() {
+    char text[100], enc[100], dec[100];
+    int key;
+    printf("Text: "); fgets(text, 100, stdin);
+    text[strcspn(text, "\n")] = 0;
+    printf("Key: "); scanf("%d", &key);
+
+    encrypt(text, key, enc);
+    printf("Encrypted: %s\n", enc);
+    decrypt(enc, key, dec);
+    printf("Decrypted: %s\n", dec);
+    return 0;
+}
