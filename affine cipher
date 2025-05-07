@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <ctype.h>
+
+int modInverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++)
+        if ((a * x) % m == 1)
+            return x;
+    return -1;
+}
+
+int gcd(int a, int b) {
+    if (b == 0)
+        return a;
+    return gcd(b, a % b);
+}
+
+char decryptChar(char ch, int a_inv, int b) {
+    if (isupper(ch)) {
+        int x = ch - 'A';
+        int dec = (a_inv * (x - b + 26)) % 26;
+        return 'A' + dec;
+    }
+    return ch;
+}
+
+void decryptText(char *ciphertext, int a, int b) {
+    int a_inv = modInverse(a, 26);
+    if (a_inv == -1) {
+        printf("No modular inverse exists for a = %d under mod 26.\n", a);
+        return;
+    }
+
+    for (int i = 0; ciphertext[i] != '\0'; i++) {
+        putchar(decryptChar(ciphertext[i], a_inv, b));
+    }
+    printf("\n");
+}
+
+int main() {
+    int x1 = 4, x2 = 19;
+    int y1 = 1, y2 = 20;
+    int a_candidate = -1, b_candidate = -1;
+
+    int dx = (x2 - x1 + 26) % 26; 
+    int dy = (y2 - y1 + 26) % 26;  
+
+    for (int a = 1; a < 26; a++) {
+        if (gcd(a, 26) == 1) {
+            int inv = modInverse(dx, 26);
+            if (inv == -1) continue;
+            if ((a * dx) % 26 == dy) {
+                a_candidate = a;
+                break;
+            }
+        }
+    }
+
+    if (a_candidate != -1) {
+        b_candidate = (y1 - a_candidate * x1 + 26 * 26) % 26; 
+
+        printf("Possible keys found: a = %d, b = %d\n", a_candidate, b_candidate);
+
+        char ciphertext[] = "BUBUBUBU";  
+        printf("Decrypted text:\n");
+        decryptText(ciphertext, a_candidate, b_candidate);
+    } else {
+        printf("Failed to determine keys.\n");
+    }
+
+    return 0;
+}
