@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+void encrypt(char *msg, char *key) {
+    char map[26], used[26] = {0};
+    int i, j = 0;
+    for (i = 0; key[i]; i++) {
+        char c = toupper(key[i]);
+        if (!used[c - 'A']) map[j++] = c, used[c - 'A'] = 1;
+    }
+    for (i = 0; i < 26; i++)
+        if (!used[i]) map[j++] = 'A' + i;
+
+    for (i = 0; msg[i]; i++) {
+        if (isalpha(msg[i])) {
+            char up = toupper(msg[i]);
+            char enc = map[up - 'A'];
+            putchar(islower(msg[i]) ? tolower(enc) : enc);
+        } else putchar(msg[i]);
+    }
+}
+
+int main() {
+    char msg[] = "Meet me at the park at eleven am";
+    encrypt(msg, "CIPHER");
+    return 0;
+}
